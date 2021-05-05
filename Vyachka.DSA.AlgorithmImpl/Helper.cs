@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Numerics;
 using System.Security.Cryptography;
-using System.Text;
 
 namespace Vyachka.DSA.AlgorithmImpl
 {
@@ -36,8 +34,11 @@ namespace Vyachka.DSA.AlgorithmImpl
             Console.WriteLine();
             HashAlgorithm sha = SHA1.Create();
             byte[] result = sha.ComputeHash(initialMsg);
-            //Array.Reverse(result);
-            BigInteger hash = new BigInteger(result);
+            Array.Reverse(result);
+            byte[] uResult = new byte[result.Length + 1];
+            result.CopyTo(uResult, 0);
+            uResult[^1] = 0;
+            BigInteger hash = new BigInteger(uResult);
             Console.WriteLine($"hash: {hash}");
             //Hi = (Hi−1 + Mi)2 mod n
             /*int hash = 100;
@@ -47,5 +48,6 @@ namespace Vyachka.DSA.AlgorithmImpl
             }*/
             return hash;
         }
+
     }
 }

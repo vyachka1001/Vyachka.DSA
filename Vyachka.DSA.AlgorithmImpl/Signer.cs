@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Numerics;
-using System.Security.Cryptography;
-using System.Text;
+﻿using System.Numerics;
 
 namespace Vyachka.DSA.AlgorithmImpl
 {
@@ -20,7 +16,6 @@ namespace Vyachka.DSA.AlgorithmImpl
         public static bool CheckSign(byte[] msg, BigInteger r, BigInteger s, BigInteger q, BigInteger p,
                               BigInteger h, BigInteger x, out BigInteger v)
         {
-            //s−1mod q  = sq-2 mod q
             BigInteger w = Helper.FastExp(s, q - 2, q);
             BigInteger hashImage = Helper.CountHashImage(msg);
             BigInteger u1 = hashImage * w % q;

@@ -18,7 +18,7 @@ namespace Tester
             string qStr = "1193447034984784682329306571139467195163334221569";
             BigInteger q = BigInteger.Parse(qStr);
 
-            string input = "BSUIR";
+            string input = "";
             Signer.SignInitialMsg(Encoding.ASCII.GetBytes(input), q: q, p: p, k: 6274, x: 11934, h: 3, out BigInteger r, out BigInteger s);
             Console.WriteLine(r + "," + s);
             Console.WriteLine(Signer.CheckSign(Encoding.ASCII.GetBytes(input), r, s, q: q, p: p, h: 3, x: 11934, out BigInteger v));
