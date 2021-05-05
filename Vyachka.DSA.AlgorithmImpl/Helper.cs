@@ -34,17 +34,17 @@ namespace Vyachka.DSA.AlgorithmImpl
             }
 
             Console.WriteLine();
-            /*HashAlgorithm sha = SHA1.Create();
+            HashAlgorithm sha = SHA1.Create();
             byte[] result = sha.ComputeHash(initialMsg);
             //Array.Reverse(result);
             BigInteger hash = new BigInteger(result);
-            Console.WriteLine(hash.ToString());*/
-            /*Hi= (Hi−1 + Mi)2 mod n*/
-            int hash = 100;
+            Console.WriteLine($"hash: {hash}");
+            //Hi = (Hi−1 + Mi)2 mod n
+            /*int hash = 100;
             for (int i = 0; i < initialMsg.Length; i++)
             {
                 hash = (hash + initialMsg[i]) * (hash + initialMsg[i]) % 323;
-            }
+            }*/
             return hash;
         }
     }

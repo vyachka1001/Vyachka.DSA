@@ -6,43 +6,30 @@ using System.Text;
 
 namespace Vyachka.DSA.AlgorithmImpl
 {
-    public class Signer
+    public static class Signer
     {
-        private BigInteger Q { get; set; }
-        private BigInteger P { get; set; }
-        private BigInteger K { get; set; }
-        private BigInteger X { get; set; }
-        private BigInteger H { get; set; } 
-
-        public Signer(BigInteger q, BigInteger p, BigInteger k, BigInteger x, BigInteger h)
-        {
-            Q = q;
-            P = p;
-            K = k;
-            X = x;
-            H = h;
-        }
-
-        public bool SignInitialMsg(byte[] initialMsg, out BigInteger r, out BigInteger s)
+        public static bool SignInitialMsg(byte[] initialMsg, BigInteger q, BigInteger p, BigInteger k, BigInteger x, BigInteger h, out BigInteger r, out BigInteger s)
         {
             BigInteger hashImage = Helper.CountHashImage(initialMsg);
-            BigInteger g = Helper.FastExp(H, (P - 1) / Q, P);
-            r = CountR(g);
-            s = CountS(hashImage, r);
-            return (r == 0 || s == 0)
-           
+            BigInteger g = Helper.FastExp(h, (p - 1) / q, p);
+            r = Helper.FastExp(g, k, p) % q;
+            s = Helper.FastExp(k, q - 2, q) * (hashImage + x * r) % q;
+            return (r == 0 || s == 0);
         }
 
-        private BigInteger CountR(BigInteger g)
+        public static bool CheckSign(byte[] msg, BigInteger r, BigInteger s, BigInteger q, BigInteger p,
+                              BigInteger h, BigInteger x, out BigInteger v)
         {
-            //r = (g^k mod p) mod q
-            return Helper.FastExp(g, K, P) % Q;
-        }
-
-        private BigInteger CountS(BigInteger hashImage, BigInteger r)
-        {
-            //s = k^(−1)(h(M) + x * r) mod q
-            return ((hashImage + X * r) / K) % Q;
+            //s−1mod q  = sq-2 mod q
+            BigInteger w = Helper.FastExp(s, q - 2, q);
+            BigInteger hashImage = Helper.CountHashImage(msg);
+            BigInteger u1 = hashImage * w % q;
+            BigInteger u2 = r * w % q;
+            BigInteger g = Helper.FastExp(h, (p - 1) / q, p);
+            BigInteger y = Helper.FastExp(g, x, p);
+            v = (Helper.FastExp(g, u1, p) * Helper.FastExp(y, u2, p) % p) % q;
+            //Console.WriteLine($"w:{w} hash:{hashImage} u1:{u1} u2:{u2} g:{g} v:{v} y:{y}");
+            return v == r;
         }
     }
 }
