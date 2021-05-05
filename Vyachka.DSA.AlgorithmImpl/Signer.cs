@@ -10,7 +10,7 @@ namespace Vyachka.DSA.AlgorithmImpl
             BigInteger g = Helper.FastExp(h, (p - 1) / q, p);
             r = Helper.FastExp(g, k, p) % q;
             s = Helper.FastExp(k, q - 2, q) * (hashImage + x * r) % q;
-            return (r == 0 || s == 0);
+            return (r != 0 && s != 0);
         }
 
         public static bool CheckSign(byte[] msg, BigInteger r, BigInteger s, BigInteger q, BigInteger p,

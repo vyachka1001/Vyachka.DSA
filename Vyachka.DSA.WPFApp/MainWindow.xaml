@@ -25,8 +25,7 @@
         <TextBox x:Name="FilePath_textBox" HorizontalAlignment="Left" Margin="102,388,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="300" FontSize="16" Height="25"/>
         <Menu Height="20" VerticalAlignment="Top">
             <MenuItem Header="File">
-                <MenuItem Header="Open file to sign"/>
-                <MenuItem Header="Open file to check sign"/>
+                <MenuItem Header="Open file" Click="Open_btn_Click"/>
                 <Separator></Separator>
                 <MenuItem Header="Exit"/>
             </MenuItem>

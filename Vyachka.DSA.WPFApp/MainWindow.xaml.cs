@@ -1,6 +1,9 @@
-﻿using System.IO;
+﻿using Microsoft.Win32;
+using System;
+using System.IO;
 using System.Linq;
 using System.Numerics;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using Vyachka.DSA.AlgorithmImpl;
@@ -68,24 +71,77 @@ namespace Vyachka.DSA.WPFApp
             BigInteger p = BigInteger.Parse(PValue_textBox.Text);
             BigInteger x = BigInteger.Parse(XValue_textBox.Text);
             BigInteger h = BigInteger.Parse(HValue_textBox.Text);
-            byte[] initialMsg = File.ReadAllBytes(FilePath_textBox.Text);
 
-            BigInteger r = 1;
-            BigInteger s = 2;
-            string result;
+            string msg = File.ReadAllText(FilePath_textBox.Text);
+            msg = TrimSignature(msg, out BigInteger r, out BigInteger s);
+            byte[] initialMsg = Encoding.ASCII.GetBytes(msg);
             Hash_textBox.Text = Helper.CountHashImage(initialMsg).ToString();
 
+            string result;
+            MessageBoxImage image;
             if (Signer.CheckSign(initialMsg, r, s, q, p, h, x, out BigInteger v))
             {
                 result = "EQUAL";
+                image = MessageBoxImage.Information;
             }
             else
             {
                 result = "NOT EQUAL";
+                image = MessageBoxImage.Error;
             }
 
-            MessageBox.Show($"Checking result:\nr = {r}; v = {v}\nResult is {result}", "Checking result",
-                            MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show($"Checking result:\nr = {r};\nv = {v}\nResult is {result}", "Checking result",
+                            MessageBoxButton.OK, image);
+        }
+
+        private string TrimSignature(string msg, out BigInteger r, out BigInteger s)
+        {
+            string rStr = "";
+            string sStr = "";
+
+            int commaCount = 0;
+            int index = msg.Length - 1;
+            while(commaCount < 2)
+            {
+                if (commaCount == 0)
+                {
+                    sStr = msg[index] + sStr;
+                    index--;
+                    if (msg[index] == ',')
+                    {
+                        commaCount++;
+                        index--;
+                    }
+                }
+
+                if (commaCount == 1)
+                {
+                    rStr = msg[index] + rStr;
+                    index--;
+                    if (msg[index] == ',')
+                    {
+                        commaCount++;
+                    }
+                }
+            }
+
+            r = BigInteger.Parse(rStr);
+            s = BigInteger.Parse(sStr);
+
+            return msg.Substring(0, index);
+        }
+
+        private void Open_btn_Click(object sender, RoutedEventArgs e)
+        {
+            var openFileDialog = new OpenFileDialog
+            {
+                InitialDirectory = "D:\\"
+            };
+
+            if (openFileDialog.ShowDialog() == true)
+            {
+                FilePath_textBox.Text = openFileDialog.FileName;
+            }
         }
 
         private bool IsFieldsFilled(string action)
