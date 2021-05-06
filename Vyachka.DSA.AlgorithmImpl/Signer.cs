@@ -4,7 +4,8 @@ namespace Vyachka.DSA.AlgorithmImpl
 {
     public static class Signer
     {
-        public static bool SignInitialMsg(byte[] initialMsg, BigInteger q, BigInteger p, BigInteger k, BigInteger x, BigInteger h, out BigInteger r, out BigInteger s)
+        public static bool SignInitialMsg(byte[] initialMsg, BigInteger q, BigInteger p, BigInteger k, 
+                                          BigInteger x, BigInteger h, out BigInteger r, out BigInteger s)
         {
             BigInteger hashImage = Helper.CountHashImage(initialMsg);
             BigInteger g = Helper.FastExp(h, (p - 1) / q, p);
@@ -14,7 +15,7 @@ namespace Vyachka.DSA.AlgorithmImpl
         }
 
         public static bool CheckSign(byte[] msg, BigInteger r, BigInteger s, BigInteger q, BigInteger p,
-                              BigInteger h, BigInteger x, out BigInteger v)
+                                     BigInteger h, BigInteger x, out BigInteger v)
         {
             BigInteger w = Helper.FastExp(s, q - 2, q);
             BigInteger hashImage = Helper.CountHashImage(msg);

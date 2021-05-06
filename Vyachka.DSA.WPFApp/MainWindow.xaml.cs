@@ -138,6 +138,10 @@ namespace Vyachka.DSA.WPFApp
 
         private void Open_btn_Click(object sender, RoutedEventArgs e)
         {
+            RValue_textBox.Clear();
+            SValue_textBox.Clear();
+            FilePath_textBox.Clear();
+
             var openFileDialog = new OpenFileDialog
             {
                 InitialDirectory = "D:\\"
