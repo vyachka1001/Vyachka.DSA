@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Numerics;
+using System.Security.Cryptography;
 using System.Text;
 using Vyachka.DSA.AlgorithmImpl;
 
@@ -18,10 +19,19 @@ namespace Tester
             string qStr = "1193447034984784682329306571139467195163334221569";
             BigInteger q = BigInteger.Parse(qStr);
 
-            string input = "";
-            Signer.SignInitialMsg(Encoding.ASCII.GetBytes(input), q: q, p: p, k: 6274, x: 11934, h: 3, out BigInteger r, out BigInteger s);
-            Console.WriteLine(r + "," + s);
-            Console.WriteLine(Signer.CheckSign(Encoding.ASCII.GetBytes(input), r, s, q: q, p: p, h: 3, x: 11934, out BigInteger v));
+            string input = "BSUIR";
+            /*Signer.SignInitialMsg(Encoding.ASCII.GetBytes(input), q: q, p: p, k: 6274, x: 11934, h: 3, out BigInteger r, out BigInteger s);
+            Console.WriteLine(r + "," + s);*/
+            Console.WriteLine($"Hash myself = {Helper.CountHashImage(Encoding.ASCII.GetBytes(input))}");
+            HashAlgorithm sha = SHA1.Create();
+            byte[] result = sha.ComputeHash(Encoding.ASCII.GetBytes(input));
+            Array.Reverse(result);
+            byte[] uResult = new byte[result.Length + 1];
+            result.CopyTo(uResult, 0);
+            uResult[^1] = 0;
+            BigInteger hash = new BigInteger(uResult);
+            Console.WriteLine($"hash        : {hash}");
+            /*Console.WriteLine(Signer.CheckSign(Encoding.ASCII.GetBytes(input), r, s, q: q, p: p, h: 3, x: 11934, out BigInteger v));*/
             Console.ReadKey();
         }
     }

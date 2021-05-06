@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using System.Security.Cryptography;
 
@@ -27,130 +29,263 @@ namespace Vyachka.DSA.AlgorithmImpl
 
         public static BigInteger CountHashImage(byte[] initialMsg)
         {
-            int amountOfBlocks = initialMsg.Length / 64;
-            int amountOfRemainingBits = initialMsg.Length % 64 * 8;
-
-            int startIndex = amountOfBlocks * 64;
-            int amountOfBytes = initialMsg.Length - startIndex;
-            byte[] remainingBytes = new byte[amountOfBytes];
-            for (int i = startIndex; i < initialMsg.Length; i++)
-            {
-                remainingBytes[i - startIndex] = initialMsg[i];
-            }
-
-            BitArray remainingBits = new BitArray(remainingBytes);
-            if (amountOfRemainingBits > 447)
-            {
-                //тут пока хз
-            }
-            else
-            {
-                string bits = remainingBits.ToString();
-                bits += '1';
-                for(int i = 0; i < 447 - amountOfRemainingBits - 1; i++)
-                {
-                    bits += '0';
-                }
-
-                //как-то пихать длину
-            }
-
-            /*for (int i = 0; i < initialMsg.Length; i++)
-            {
-                Console.Write(initialMsg[i] + " ");
-            }
-
-            Console.WriteLine();
-            HashAlgorithm sha = SHA1.Create();
-            byte[] result = sha.ComputeHash(initialMsg);
+            byte[] result = Sha1Algorithm(initialMsg);
             Array.Reverse(result);
             byte[] uResult = new byte[result.Length + 1];
             result.CopyTo(uResult, 0);
             uResult[^1] = 0;
             BigInteger hash = new BigInteger(uResult);
-            Console.WriteLine($"hash: {hash}");*/
-
-            /*int hash = 100;
-            for (int i = 0; i < initialMsg.Length; i++)
-            {
-                hash = (hash + initialMsg[i]) * (hash + initialMsg[i]) % 323;
-            }*/
-
             return hash;
         }
 
-        /*
-        public static void processBlock(uint[] block, uint[] hash, uint[] bigarray)
+        static byte[] Sha1Algorithm(byte[] plaintext)
         {
-            uint temp = 0;
-            const uint k0 = 0x5a827999;
-            const uint k1 = 0x6ed9eba1;
-            const uint k2 = 0x8f1bbcdc;
-            const uint k3 = 0xca62c1d6;
-            int t = 0;
-            for (t = 0; t < 16; t++)
+            Block512[] blocks = ConvertPaddedTextToBlockArray(PadPlainText(plaintext));
+            uint[] H = { 0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476, 0xc3d2e1f0 };
+            uint[] K = DefineK();
+
+            for (int i = 0; i < blocks.Length; i++)
             {
-                bigarray[t] = block[t];
+                uint[] W = CreateMessageScheduleSha1(blocks[i]);
+                
+                uint a = H[0];
+                uint b = H[1];
+                uint c = H[2];
+                uint d = H[3];
+                uint e = H[4];
+
+                for (int t = 0; t < 80; t++)
+                {
+                    uint T = RotL(5, a) + F(t, b, c, d) + e + K[t] + W[t];
+                    e = d;
+                    d = c;
+                    c = RotL(30, b);
+                    b = a;
+                    a = T;
+                }
+
+                H[0] += a;
+                H[1] += b;
+                H[2] += c;
+                H[3] += d;
+                H[4] += e;
             }
 
-            for (t = 16; t < 80; t++)
-            {
-                bigarray[t] = circularShift(1, (bigarray[t - 3] ^ bigarray[t - 8] ^ bigarray[t - 14] ^ bigarray[t - 16]));
-            }
-
-            uint A = hash[0];
-            uint B = hash[1];
-            uint C = hash[2];
-            uint D = hash[3];
-            uint E = hash[4];
-
-            for (t = 0; t < 20; t++)
-            {
-                temp = circularShift(5, A) + ((B & C) | ((~B) & D)) + E + bigarray[t] + k0;
-                E = D;
-                D = C;
-                C = circularShift(30, B);
-                B = A;
-                A = temp;
-            }
-
-            for (t = 20; t < 40; t++)
-            {
-                temp = circularShift(5, A) + (B ^ C ^ D) + E + bigarray[t] + k1;
-                E = D;
-                D = C;
-                C = circularShift(30, B);
-                B = A;
-                A = temp;
-            }
-
-            for (t = 40; t < 60; t++)
-            {
-                temp = circularShift(5, A) + ((B & C) | (B & D) | (C & D)) + E + bigarray[t] + k2;
-                E = D;
-                D = C;
-                C = circularShift(30, B);
-                B = A;
-                A = temp;
-            }
-
-            for (t = 60; t < 80; t++)
-            {
-                temp = circularShift(5, A) + (B ^ C ^ D) + E + bigarray[t] + k3;
-                E = D;
-                D = C;
-                C = circularShift(30, B);
-                B = A;
-                A = temp;
-            }
-
-            hash[0] += A;
-            hash[1] += B;
-            hash[2] += C;
-            hash[3] += D;
-            hash[4] += E;   
+            return UIntArrayToByteArray(H);
         }
-        */
 
+        private static uint[] DefineK()
+        {
+            uint[] k = new uint[80];
+
+            for (int i = 0; i < 80; i++)
+            {
+                if (i <= 19)
+                {
+                    k[i] = 0x5a827999;
+                }
+                else if (i <= 39)
+                {
+                    k[i] = 0x6ed9eba1;
+                }
+                else if (i <= 59)
+                {
+                    k[i] = 0x8f1bbcdc;
+                }
+                else
+                {
+                    k[i] = 0xca62c1d6;
+                }
+            }
+
+            return k;
+        }
+
+        static uint F(int t, uint x, uint y, uint z)
+        {
+            if (t >= 0 && t <= 19)
+            {
+                return Ch(x, y, z);
+            }
+            else if (t >= 20 && t <= 39)
+            {
+                return Parity(x, y, z);
+            }
+            else if (t >= 40 && t <= 59)
+            {
+                return Maj(x, y, z);
+            }
+            else if (t >= 60 && t <= 79)
+            {
+                return Parity(x, y, z);
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
+        static uint Ch(uint x, uint y, uint z)
+        {
+            return (x & y) ^ (~x & z);
+        }
+
+        static uint Maj(uint x, uint y, uint z)
+        {
+            return (x & y) ^ (x & z) ^ (y & z);
+        }
+
+        static uint Parity(uint x, uint y, uint z)
+        {
+            return x ^ y ^ z;
+        }
+
+        private static byte[] PadPlainText(byte[] plaintext)
+        {
+            int numberBits = plaintext.Length * 8;
+            int t = (numberBits + 8 + 64) / 512;
+            int k = 512 * (t + 1) - (numberBits + 8 + 64);
+            int n = k / 8;
+
+            List<byte> paddedtext = plaintext.ToList();
+            paddedtext.Add(0x80);
+            for (int i = 0; i < n; i++)
+            {
+                paddedtext.Add(0);
+            }
+
+            byte[] b = BitConverter.GetBytes((ulong)numberBits);
+            Array.Reverse(b);
+
+            for (int i = 0; i < b.Length; i++)
+            {
+                paddedtext.Add(b[i]);
+            }
+
+            return paddedtext.ToArray();
+        }
+
+        static Block512[] ConvertPaddedTextToBlockArray(byte[] paddedtext)
+        {
+            int numberBlocks = (paddedtext.Length * 8) / 512;
+            Block512[] blocks = new Block512[numberBlocks];
+
+            for (int i = 0; i < numberBlocks; i++)
+            {
+                byte[] b = new byte[64];
+                for (int j = 0; j < 64; j++)
+                {
+                    b[j] = paddedtext[i * 64 + j];
+                }
+
+                uint[] words = ByteArrayToUIntArray(b);
+                blocks[i] = new Block512(words);
+            }
+
+            return blocks;
+        }
+
+        public static uint[] ByteArrayToUIntArray(byte[] b)
+        {
+            int numberBytes = b.Length;
+            int n = numberBytes / 4;
+            uint[] word32Array = new uint[n];
+
+            for (int i = 0; i < n; i++)
+            {
+                word32Array[i] = ByteArrayToUInt(b, 4 * i);
+            }
+
+            return word32Array;
+        }
+
+        public static uint ByteArrayToUInt(byte[] b, int startIndex)
+        {
+            uint c = 256;
+            uint output = 0;
+
+            for (int i = startIndex; i < startIndex + 4; i++)
+            {
+                output = output * c + b[i];
+            }
+
+            return output;
+        }
+
+        static uint[] CreateMessageScheduleSha1(Block512 block)
+        {
+            uint[] W = new uint[80];
+            for (int t = 0; t < 80; t++)
+            {
+                if (t < 16)
+                {
+                    W[t] = block.words[t];
+                }
+                else
+                {
+                    W[t] = RotL(1, W[t - 3] ^ W[t - 8] ^ W[t - 14] ^ W[t - 16]);
+                }
+            }
+
+            return W;
+        }
+
+        static uint RotL(int n, uint x)
+        {
+            return (x << n) | (x >> 32 - n);
+        }
+
+        public static byte[] UIntArrayToByteArray(uint[] words)
+        {
+            List<byte> b = new List<byte>();
+
+            for (int i = 0; i < words.Length; i++)
+            {
+                b.AddRange(UIntToByteArray(words[i]));
+            }
+
+            return b.ToArray();
+        }
+
+        public static byte[] UIntToByteArray(uint x)
+        {
+            byte[] b = BitConverter.GetBytes(x);
+            Array.Reverse(b);
+            return b;
+        }
+
+        /*Console.WriteLine();
+        HashAlgorithm sha = SHA1.Create();
+        byte[] result = sha.ComputeHash(initialMsg);
+        Array.Reverse(result);
+        byte[] uResult = new byte[result.Length + 1];
+        result.CopyTo(uResult, 0);
+        uResult[^1] = 0;
+        BigInteger hash = new BigInteger(uResult);
+        Console.WriteLine($"hash: {hash}");*/
+
+        /*int hash = 100;
+        for (int i = 0; i < initialMsg.Length; i++)
+        {
+            hash = (hash + initialMsg[i]) * (hash + initialMsg[i]) % 323;
+        }*/
+    }
+
+    public class Block512
+    {
+        public uint[] words;
+
+        public Block512(uint[] words)
+        {
+            if (words.Length == 16)
+            {
+                this.words = words;
+            }
+            else
+            {
+                Console.WriteLine("ERROR: A block must be 16 words");
+                this.words = null;
+            }
+        }
     }
 }
