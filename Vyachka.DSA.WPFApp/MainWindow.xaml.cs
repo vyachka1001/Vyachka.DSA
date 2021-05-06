@@ -42,6 +42,8 @@ namespace Vyachka.DSA.WPFApp
             if (Signer.SignInitialMsg(initialMsg, q, p, k, x, h , out BigInteger r, out BigInteger s))
             {
                 Hash_textBox.Text = Helper.CountHashImage(initialMsg).ToString();
+                RValue_textBox.Text = r.ToString();
+                SValue_textBox.Text = s.ToString();
                 string extension = FilePath_textBox.Text.Substring(FilePath_textBox.Text.Length - 4, 4);
                 string filePath = FilePath_textBox.Text[0..^4];
                 filePath = filePath + "_signed" + extension;
@@ -75,7 +77,10 @@ namespace Vyachka.DSA.WPFApp
             string msg = File.ReadAllText(FilePath_textBox.Text);
             msg = TrimSignature(msg, out BigInteger r, out BigInteger s);
             byte[] initialMsg = Encoding.ASCII.GetBytes(msg);
+
             Hash_textBox.Text = Helper.CountHashImage(initialMsg).ToString();
+            RValue_textBox.Text = r.ToString();
+            SValue_textBox.Text = s.ToString();
 
             string result;
             MessageBoxImage image;

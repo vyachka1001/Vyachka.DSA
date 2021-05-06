@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Vyachka.DSA.WPFApp"
         mc:Ignorable="d"
-        Title="MainWindow" Height="640" Width="520">
+        Title="MainWindow" Height="640" Width="535">
     <Grid>
         <Label Content="q:" HorizontalAlignment="Left" Margin="30,40,0,0" VerticalAlignment="Top" FontSize="16"/>
         <Label Content="p:" HorizontalAlignment="Left" Margin="30,110,0,0" VerticalAlignment="Top" FontSize="16"/>
@@ -17,8 +17,8 @@
         <TextBox x:Name="HValue_textBox" HorizontalAlignment="Left" Margin="60,170,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="400" Height="50" FontSize="14" VerticalScrollBarVisibility="Visible" TextChanged="TextBox_TextChanged"/>
         <TextBox x:Name="XValue_textBox" HorizontalAlignment="Left" Margin="60,240,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="400" Height="50" FontSize="14" VerticalScrollBarVisibility="Visible" TextChanged="TextBox_TextChanged"/>
         <TextBox x:Name="KValue_textBox" HorizontalAlignment="Left" Margin="60,310,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="400" Height="50" FontSize="14" VerticalScrollBarVisibility="Visible" TextChanged="TextBox_TextChanged"/>
-        <Label Content="Hash:" HorizontalAlignment="Left" Margin="236,484,0,0" VerticalAlignment="Top" FontSize="16"/>
-        <TextBox x:Name="Hash_textBox" HorizontalAlignment="Left" Margin="60,515,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="400" Height="75" FontSize="14" VerticalScrollBarVisibility="Visible" IsEnabled="False"/>
+        <Label Content="Hash:" HorizontalAlignment="Left" Margin="66,484,0,0" VerticalAlignment="Top" FontSize="16"/>
+        <TextBox x:Name="Hash_textBox" HorizontalAlignment="Left" Margin="10,515,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="160" Height="75" FontSize="14" VerticalScrollBarVisibility="Visible" IsReadOnly="True"/>
         <Button x:Name="Sign_btn" Content="Sign" HorizontalAlignment="Left" Margin="140,439,0,0" VerticalAlignment="Top" Height="40" Width="80" FontSize="16" Click="Sign_btn_Click"/>
         <Button x:Name="CheckSign_btn" Content="Check" HorizontalAlignment="Left" Margin="300,439,0,0" VerticalAlignment="Top" Height="40" Width="80" FontSize="16" Click="CheckSign_btn_Click"/>
         <Label Content="File:" HorizontalAlignment="Left" Margin="60,388,0,0" VerticalAlignment="Top" FontSize="16"/>
@@ -30,5 +30,9 @@
                 <MenuItem Header="Exit"/>
             </MenuItem>
         </Menu>
+        <TextBox x:Name="RValue_textBox" HorizontalAlignment="Left" Margin="180,515,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="160" Height="75" FontSize="14" VerticalScrollBarVisibility="Visible" IsReadOnly="True"/>
+        <TextBox x:Name="SValue_textBox" HorizontalAlignment="Left" Margin="350,515,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="160" Height="75" FontSize="14" VerticalScrollBarVisibility="Visible" IsReadOnly="True"/>
+        <Label Content="S:" HorizontalAlignment="Left" Margin="419,484,0,0" VerticalAlignment="Top" FontSize="16"/>
+        <Label Content="R:" HorizontalAlignment="Center" Margin="0,484,0,0" VerticalAlignment="Top" FontSize="16"/>
     </Grid>
 </Window>
