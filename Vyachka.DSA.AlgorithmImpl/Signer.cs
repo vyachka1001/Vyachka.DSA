@@ -11,6 +11,7 @@ namespace Vyachka.DSA.AlgorithmImpl
             BigInteger g = Helper.FastExp(h, (p - 1) / q, p);
             r = Helper.FastExp(g, k, p) % q;
             s = Helper.FastExp(k, q - 2, q) * (hashImage + x * r) % q;
+
             return (r != 0 && s != 0);
         }
 
@@ -24,7 +25,7 @@ namespace Vyachka.DSA.AlgorithmImpl
             BigInteger g = Helper.FastExp(h, (p - 1) / q, p);
             BigInteger y = Helper.FastExp(g, x, p);
             v = (Helper.FastExp(g, u1, p) * Helper.FastExp(y, u2, p) % p) % q;
-            //Console.WriteLine($"w:{w} hash:{hashImage} u1:{u1} u2:{u2} g:{g} v:{v} y:{y}");
+            
             return v == r;
         }
     }

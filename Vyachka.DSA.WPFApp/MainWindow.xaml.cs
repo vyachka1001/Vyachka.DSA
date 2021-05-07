@@ -37,8 +37,9 @@ namespace Vyachka.DSA.WPFApp
             BigInteger k = BigInteger.Parse(KValue_textBox.Text);
             BigInteger x = BigInteger.Parse(XValue_textBox.Text);
             BigInteger h = BigInteger.Parse(HValue_textBox.Text);
-            byte[] initialMsg = File.ReadAllBytes(FilePath_textBox.Text);
-
+            string msg = File.ReadAllText(FilePath_textBox.Text);
+            byte[] initialMsg = Encoding.ASCII.GetBytes(msg);
+            
             if (Signer.SignInitialMsg(initialMsg, q, p, k, x, h , out BigInteger r, out BigInteger s))
             {
                 Hash_textBox.Text = Helper.CountHashImage(initialMsg).ToString();
@@ -75,8 +76,9 @@ namespace Vyachka.DSA.WPFApp
             BigInteger h = BigInteger.Parse(HValue_textBox.Text);
 
             string msg = File.ReadAllText(FilePath_textBox.Text);
-            msg = TrimSignature(msg, out BigInteger r, out BigInteger s);
             byte[] initialMsg = Encoding.ASCII.GetBytes(msg);
+            msg = TrimSignature(msg, out BigInteger r, out BigInteger s);
+            initialMsg = Encoding.ASCII.GetBytes(msg);
 
             Hash_textBox.Text = Helper.CountHashImage(initialMsg).ToString();
             RValue_textBox.Text = r.ToString();
@@ -141,6 +143,7 @@ namespace Vyachka.DSA.WPFApp
             RValue_textBox.Clear();
             SValue_textBox.Clear();
             FilePath_textBox.Clear();
+            Hash_textBox.Clear();
 
             var openFileDialog = new OpenFileDialog
             {

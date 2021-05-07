@@ -35,6 +35,7 @@ namespace Vyachka.DSA.AlgorithmImpl
             result.CopyTo(uResult, 0);
             uResult[^1] = 0;
             BigInteger hash = new BigInteger(uResult);
+
             return hash;
         }
 
@@ -105,19 +106,19 @@ namespace Vyachka.DSA.AlgorithmImpl
         {
             if (t >= 0 && t <= 19)
             {
-                return Ch(x, y, z);
+                return F1(x, y, z);
             }
             else if (t >= 20 && t <= 39)
             {
-                return Parity(x, y, z);
+                return F3(x, y, z);
             }
             else if (t >= 40 && t <= 59)
             {
-                return Maj(x, y, z);
+                return F2(x, y, z);
             }
             else if (t >= 60 && t <= 79)
             {
-                return Parity(x, y, z);
+                return F3(x, y, z);
             }
             else
             {
@@ -125,17 +126,17 @@ namespace Vyachka.DSA.AlgorithmImpl
             }
         }
 
-        static uint Ch(uint x, uint y, uint z)
+        static uint F1(uint x, uint y, uint z)
         {
             return (x & y) ^ (~x & z);
         }
 
-        static uint Maj(uint x, uint y, uint z)
+        static uint F2(uint x, uint y, uint z)
         {
             return (x & y) ^ (x & z) ^ (y & z);
         }
 
-        static uint Parity(uint x, uint y, uint z)
+        static uint F3(uint x, uint y, uint z)
         {
             return x ^ y ^ z;
         }
@@ -189,14 +190,14 @@ namespace Vyachka.DSA.AlgorithmImpl
         {
             int numberBytes = b.Length;
             int n = numberBytes / 4;
-            uint[] word32Array = new uint[n];
+            uint[] uintArray = new uint[n];
 
             for (int i = 0; i < n; i++)
             {
-                word32Array[i] = ByteArrayToUInt(b, 4 * i);
+                uintArray[i] = ByteArrayToUInt(b, 4 * i);
             }
 
-            return word32Array;
+            return uintArray;
         }
 
         public static uint ByteArrayToUInt(byte[] b, int startIndex)
