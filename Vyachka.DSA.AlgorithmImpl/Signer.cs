@@ -10,7 +10,7 @@ namespace Vyachka.DSA.AlgorithmImpl
             BigInteger hashImage = Helper.CountHashImage(initialMsg);
             BigInteger g = Helper.FastExp(h, (p - 1) / q, p);
             r = Helper.FastExp(g, k, p) % q;
-            s = (Helper.FastExp(k, q - 2, q) * ((hashImage + x * r) % q)) % q;
+            s = Helper.FastExp(k, q - 2, q) * (hashImage + x * r) % q;
 
             return (r != 0 && s != 0);
         }
